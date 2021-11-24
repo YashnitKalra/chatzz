@@ -1,0 +1,62 @@
+html, body{
+    height: 100%;
+}
+
+.bg-1{
+    background-color: #0d1321;
+}
+
+.text-1{
+    color:#0d1321;
+}
+
+.bg-2{
+    background-color: #1d2d44;
+}
+
+.text-2{
+    color:#1d2d44;
+}
+
+.bg-3{
+    background-color: #3e5c76;
+}
+
+.text-3{
+    color:#3e5c76;
+}
+
+.bg-4{
+    background-color: #748cab;
+}
+
+.text-4{
+    color:#748cab;
+}
+
+.show-sm{
+    display: none;
+}
+
+tr:hover{
+    cursor: pointer;
+    background-color: #748cab;
+}
+
+.sent-message{
+    margin-left: auto;
+    background: radial-gradient(#1f29a8, #11165f);
+}
+
+.received-message{
+    background: radial-gradient(#006199, #01456d);
+}
+
+@media only screen and (max-width: 600px) {
+    .show-sm{
+        display: inline;
+    }
+    .hide-sm{
+        display: none;
+    }
+}

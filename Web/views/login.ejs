@@ -1,0 +1,22 @@
+<%- include('header.ejs'); %>
+    <div class="text-center bg-3 p-3 mx-2">
+        <h2>Login</h2>
+        <form action="login" method="POST">
+            <div class="input-group my-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text bg-4 border-0"><i class="fas fa-user text-2"></i></span>
+                </div>
+                <input type="text" class="form-control" placeholder="Username" name="_id">
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text bg-4 border-0"><i class="fas fa-key text-2"></i></span>
+                </div>
+                <input type="password" class="form-control" placeholder="Password" name="password">
+            </div>
+
+            <input type="submit" value="Login" class="btn bg-1 text-light form-control">
+        </form>
+    </div>
+<%- include('footer.ejs'); %>

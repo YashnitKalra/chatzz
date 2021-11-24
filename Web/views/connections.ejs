@@ -1,0 +1,34 @@
+<div class="tab-pane container-fluid fade" id="connections">
+    <table class="table table-borderless text-center text-light" id="connectionsTable"></table>
+</div>
+
+<script>
+    function openchat(id){
+        if(!chatUsers.has(id)){
+            chatUsers.add(id);
+            addNavItem(id);
+            addTabPane(id);
+        }
+        $(`#${id}-chat-link`).click();
+        $(`#message-nav`).click();
+    }
+
+    function addConnection(id, name){
+        $("#connectionsTable").append(`<tr onclick="openchat('${id}')"><td>${name}</td><td>></td></tr>`);
+    }
+
+    $.ajax({
+        url: "/getConnections",
+        method: "GET",
+        success: function(result){
+            result.sort(function(a, b){
+                return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+            });
+            for(connection of result){
+                let id = connection._id;
+                let name = connection.name;
+                addConnection(id, name);
+            }
+        }
+    });
+</script>

@@ -1,0 +1,45 @@
+<%- include('header.ejs'); %>
+    <div class="text-center bg-3 p-3">
+        <h2>Sign Up</h2>
+        <form action="signup" method="POST" class="p-3"  onsubmit="return check()">
+            <div class="row mb-3">
+                <div class="col-sm-3 bg-1 pt-1">Fullname:</div>
+                <div class="col-sm-9 p-0"><input type="text" class="form-control" name="fullname"></div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-3 bg-1 pt-1">Username:</div>
+                <div class="col-sm-9 p-0"><input type="text" class="form-control" name="username"></div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-3 bg-1 pt-1">Email:</div>
+                <div class="col-sm-9 p-0"><input type="text" class="form-control" name="email"></div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-sm-3 bg-1 pt-1">Password:</div>
+                <div class="col-sm-9 p-0">
+                    <div class="input-group">
+                        <input type="password" class="form-control" placeholder="Password" name="password">
+                        <input type="password" class="form-control" placeholder="Confirm Password" name="password2">
+                    </div>
+                </div>
+            </div>
+
+            <div class="row my-3">
+                <div class="col-sm-12 p-0"><input type="submit" class="form-control btn bg-1 text-light" value="Sign Up"></div>
+            </div>
+        </form>
+    </div>
+<%- include('footer.ejs'); %>
+<script>
+    function check(){
+        let p1 = document.getElementsByName("password")[0].value;
+        let p2 = document.getElementsByName("password2")[0].value;
+        if(p1===p2)
+            return true;
+        alert("Passwords does not match");
+        return false;
+    }
+</script>

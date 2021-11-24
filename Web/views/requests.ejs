@@ -1,0 +1,103 @@
+<div class="tab-pane container-fluid fade pt-2" id="requests">
+    <ul class="nav nav-pills nav-justified">
+        <li class="nav-item">
+            <a class="nav-link active" href="#receivedRequests" data-toggle="pill">Received</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#sentRequests" data-toggle="pill">Sent</a>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane container-fluid active" id="receivedRequests">
+            <div class="d-flex flex-column" id="receivedRequestsList"></div>
+        </div>
+        <div class="tab-pane container-fluid fade" id="sentRequests">
+            <div class="d-flex flex-column" id="sentRequestsList"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    function addReceivedRequest(id, name){
+        $("#receivedRequestsList").append(
+            `<div class="d-flex justify-content-around py-2" id="${id}-received-div">
+                <div><i class="fa fa-user"></i> ${id} <small>(${name})</small></div>
+                <div>
+                    <button type="button" class="btn btn-sm btn-outline-success" id="${id}-accept-btn"><i class="fas fa-check"></i></button>
+                    <button type="button" class="btn btn-sm btn-outline-danger" id="${id}-reject-btn"><i class="fas fa-times"></i></button>
+                </div>
+            </div>`
+        );
+
+        $(`#${id}-accept-btn`).click(() => {
+            $(this).attr("disabled", true);
+            $.ajax({
+                url: "/acceptRequest",
+                data: {"user": id},
+                method: "GET",
+                success: function(result){
+                    alert("Request Accepted");
+                    $(`#${id}-received-div`).remove();
+                    addConnection(id, name);
+                }
+            });
+        });
+
+        $(`#${id}-reject-btn`).click(() => {
+            $(this).attr("disabled", true);
+            $.ajax({
+                url: "/rejectRequest",
+                data: {"user": id},
+                method: "GET",
+                success: function(result){
+                    alert("Request Rejected");
+                    $(`#${id}-received-div`).remove();
+                }
+            });
+        });
+    }
+
+    function addSentRequest(id, name){
+        $("#sentRequestsList").append(
+            `<div class="d-flex justify-content-around py-2" id="${id}-sent-div">
+                <div><i class="fa fa-user"></i> ${id} <small>(${name})</small></div>
+                <div><button type="button" class="btn btn-sm btn-outline-danger" id="${id}-withdraw-btn"><i class="fas fa-times"></i></button>
+            </div></div>`
+        );
+
+        $(`#${id}-withdraw-btn`).click(() => {
+            $(this).attr("disabled", true);
+            $.ajax({
+                url: "/withdrawRequest",
+                data: {"user": id},
+                method: "GET",
+                success: function(result){
+                    alert("Request Withdrawn");
+                    $(`#${id}-sent-div`).remove();
+                }
+            });
+        });
+    }
+
+    // Received Requests
+    $.ajax({
+        url: "/getReceivedRequests",
+        method: "GET",
+        success: function (result) {
+            for (user of result)
+                addReceivedRequest(user._id, user.name);
+        },
+    });
+
+    // Sent Requests
+    $.ajax({
+        url: "/getSentRequests",
+        method: "GET",
+        success: function (result) {
+            for (user of result)
+                addSentRequest(user._id, user.name);
+        },
+    });
+</script>

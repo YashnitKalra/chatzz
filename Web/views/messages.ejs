@@ -1,0 +1,115 @@
+<div class="tab-pane container-fluid active p-0" id="messages">
+    <div class="d-flex h-100 p-0">
+        <div class="w-25 container px-1 border" style="overflow-y: auto;">
+            <ul class="nav nav-tabs flex-column" id="chatUsers"></ul>
+        </div>
+        <div class="w-75 bg-1 tab-content border" id="chats"></div>
+    </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    var username = "<%= username %>";
+    const socket = io();
+    socket.emit("user-logged-in", username);
+
+    let chatUsers = new Set();
+
+    function checkKey(e, user) {
+        if (e.key === "Enter")
+            sendMessage(user);
+    }
+
+    function sendMessage(id) {
+        let msg = $(`#${id}-message`).val().trim();
+        if (msg.length > 0) {
+            $.ajax({
+                url: "/sendMessage",
+                method: "POST",
+                data: { "user": id, "msg": msg },
+                success: function (result) {
+                    $(`#${id}-message`).val("");
+                    addMessage(id, result);
+                }
+            });
+        }
+    }
+
+    function addNavItem(user) {
+        $("#chatUsers").append(
+            `<li class="nav-item">
+                <a href="#${user}-tab-pane" class="nav-link" data-toggle="tab" id="${user}-chat-link" onclick="scrollBottom('${user}')">${user}</a>
+            </li>`
+        );
+    }
+
+    function addTabPane(user) {
+        $("#chats").append(
+            `<div class="tab-pane container-fluid h-100 p-0" id="${user}-tab-pane" style="overflow-y:hidden">
+                <div class="d-flex flex-column px-3" id="${user}-chats" style="height: 95%; overflow-y: auto;"></div>
+                <div class="bg-dark d-flex" style="height: 5%;">
+                    <div class="flex-grow-1 align-self-center pl-3">
+                        <input type="text" class="form-control mx-auto h-100" placeholder="Type..." id="${user}-message" onkeyup="checkKey(event, '${user}')">
+                    </div>
+                    <div class="align-self-center px-3">
+                        <button type="button" class="btn btn-success btn-sm rounded-circle" onclick="sendMessage('${user}')">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>`
+        );
+        $(`#${user}-chat-link`).on('shown.bs.tab', function (e) {
+            scrollBottom(user);
+        });
+    }
+
+    function format(s) {
+        s = s.toString();
+        if (s.length === 1)
+            s = "0" + s;
+        return s;
+    }
+
+    function addMessage(user, obj) {
+        var d = new Date(obj.timestamp);
+        $(`#${user}-chats`).append(
+            `<div class="${obj.sent ? "ml-auto" : "mr-auto"} my-1">
+                <span class="${obj.sent ? "sent-message" : "received-message"} p-2 rounded d-block">
+                    ${obj.message}&nbsp;&nbsp;
+                    <span class="d-block text-right"><sub class="d-inline-block text-right" style="color: #ddecff;">
+                        ${format(d.getDate())}/${format(d.getMonth())}/${d.getFullYear()}, ${format(d.getHours())}:${format(d.getMinutes())}
+                    </span>
+                </span>
+            </div>`
+        );
+        scrollBottom(user);
+    }
+
+    function scrollBottom(user) {
+        let ch = document.getElementById(`${user}-chats`);
+        ch.scrollTop = ch.scrollHeight - ch.clientHeight;
+    }
+
+    $.ajax({
+        url: "/getMessages",
+        method: "GET",
+        success: function (result) {
+            for (user in result) {
+                chatUsers.add(user);
+                addNavItem(user);
+                addTabPane(user);
+                for (let i = result[user].length - 1; i >= 0; i--)
+                    addMessage(user, result[user][i]);
+            }
+        }
+    });
+
+    socket.on('receive-message', (user, obj) => {
+        if (!chatUsers.has(user)) {
+            chatUsers.add(user);
+            addNavItem(user);
+            addTabPane(user);
+        }
+        addMessage(user, obj);
+    });
+</script>

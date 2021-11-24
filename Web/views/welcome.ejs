@@ -1,0 +1,30 @@
+<%- include('header.ejs'); %>
+    <div class="d-flex flex-column h-100">
+        <div>
+            <ul class="nav nav-tabs nav-justified bg-1">
+                <li class="nav-item"><a href="#messages" data-toggle="tab" class="nav-link active" id="message-nav">
+                    <span class="hide-sm">Messages</span>
+                    <span class="show-sm"><i class="fas fa-comments"></i></span>
+                </a></li>
+                <li class="nav-item"><a href="#connections" data-toggle="tab" class="nav-link">
+                    <span class="hide-sm">Connections</span>
+                    <span class="show-sm"><i class="fas fa-user-friends"></i></span>
+                </a></li>
+                <li class="nav-item"><a href="#requests" data-toggle="tab" class="nav-link">
+                    <span class="hide-sm">Requests</span>
+                    <span class="show-sm"><i class="fas fa-users"></i></span>
+                </a></li>
+                <li class="nav-item"><a href="#search" data-toggle="tab" class="nav-link">
+                    <span class="hide-sm">Search</span>
+                    <span class="show-sm"><i class="fas fa-search"></i></span>
+                </a></li>
+            </ul>
+        </div>
+        <div class="h-100 d-flex tab-content" style="overflow-y: auto;">
+            <%- include('messages.ejs') %>
+            <%- include('connections.ejs') %>
+            <%- include('requests.ejs') %>
+            <%- include('search.ejs') %>
+        </div>
+    </div>
+<%- include('footer.ejs'); %>

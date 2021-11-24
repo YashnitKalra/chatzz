@@ -1,0 +1,56 @@
+<div class="tab-pane container-fluid fade" id="search">
+    <div class="input-group my-3">
+        <input type="text" class="form-control" placeholder="Enter Name" id="name">
+        <div class="input-group-append">
+            <span class="input-group-text p-0">
+                <button type="button" class="btn py-0 h-100" id="searchBtn"><i class="fas fa-search"></i></button>
+            </span>
+        </div>
+    </div>
+    <div class="d-flex flex-column" id="results"></div>
+</div>
+
+<script>
+    $("#searchBtn").click(() => {
+        let name = $("#name").val();
+        $.ajax({
+            url: "searchName",
+            method: "GET",
+            data: {name: name},
+            success: function(res){
+                if(res.length===0)
+                    $("#results").html("No results found");
+                else{
+                    let r = $("#results");
+                    $(r).empty();
+                    for(user of res){
+                        let id = user._id;
+                        let name = user.name;
+                        $(r).append(
+                            `<div class="d-flex justify-content-around py-2" id="${id}-div">
+                                <div><i class="fa fa-user"></i> ${id} <small>(${name})</small></div>
+                                <div><button type="button" class="btn btn-sm bg-4 text-light connect-btn" id="${id}-connect-btn">Connect</button>
+                            </div></div>`
+                        );
+
+                        // add connect button functionality
+                        $(`#${id}-connect-btn`).click(() => {
+                            $(this).attr("disabled", true);
+                            $.ajax({
+                                url: "/sendConnectionRequest",
+                                method: "GET",
+                                data: {userId: id},
+                                success: function(result){
+                                    alert("Connection Request Sent");
+                                    addSentRequest(id, name);
+                                    $(`#${id}-div`).remove();
+                                }
+                            });
+                        });
+                    }
+                }
+            }
+        });
+    });
+
+</script>
