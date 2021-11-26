@@ -13,6 +13,7 @@
     socket.emit("user-logged-in", username);
 
     let chatUsers = new Set();
+    var messages = {}
 
     function checkKey(e, user) {
         if (e.key === "Enter")
@@ -28,7 +29,7 @@
                 data: { "user": id, "msg": msg },
                 success: function (result) {
                     $(`#${id}-message`).val("");
-                    addMessage(id, result);
+                    addMessage(id, result, true);
                 }
             });
         }
@@ -37,7 +38,9 @@
     function addNavItem(user) {
         $("#chatUsers").append(
             `<li class="nav-item">
-                <a href="#${user}-tab-pane" class="nav-link" data-toggle="tab" id="${user}-chat-link" onclick="scrollBottom('${user}')">${user}</a>
+                <a href="#${user}-tab-pane" class="nav-link" data-toggle="tab" id="${user}-chat-link" onclick="scrollBottom('${user}')">
+                    <span id="${user}-sentiment"></span> ${user}
+                </a>
             </li>`
         );
     }
@@ -70,18 +73,43 @@
         return s;
     }
 
-    function addMessage(user, obj) {
+    function addMessage(user, obj, analyzeSentiment) {
         var d = new Date(obj.timestamp);
         $(`#${user}-chats`).append(
             `<div class="${obj.sent ? "ml-auto" : "mr-auto"} my-1">
                 <span class="${obj.sent ? "sent-message" : "received-message"} p-2 rounded d-block">
-                    ${obj.message}&nbsp;&nbsp;
+                    ${obj.message}
                     <span class="d-block text-right"><sub class="d-inline-block text-right" style="color: #ddecff;">
                         ${format(d.getDate())}/${format(d.getMonth())}/${d.getFullYear()}, ${format(d.getHours())}:${format(d.getMinutes())}
                     </span>
                 </span>
             </div>`
         );
+
+        // keep messages of last 10 minutes for sentiment analysis
+        while(messages[user].length > 0 && obj.timestamp - messages[user][0].timestamp > 600000)
+            messages[user].shift();
+        messages[user].push({"timestamp": obj.timestamp, "message": obj.message});
+        
+        if(analyzeSentiment){
+            $.ajax({
+                url: "http://127.0.0.1:5000",
+                method: "POST",
+                data: JSON.stringify({"data": messages[user]}),
+                contentType: "application/json",
+                success: function (result) {
+                    let sentiment = result['sentiment'];
+                    if(sentiment==="0")
+                        $(`#${user}-sentiment`).html("&#128578;");
+                    else if(sentiment==="1")
+                        $(`#${user}-sentiment`).html("&#128515;");
+                    else
+                        $(`#${user}-sentiment`).html("&#128577;");
+
+                }
+            });
+        }
+
         scrollBottom(user);
     }
 
@@ -96,10 +124,11 @@
         success: function (result) {
             for (user in result) {
                 chatUsers.add(user);
+                messages[user] = [];
                 addNavItem(user);
                 addTabPane(user);
                 for (let i = result[user].length - 1; i >= 0; i--)
-                    addMessage(user, result[user][i]);
+                    addMessage(user, result[user][i], i===0);
             }
         }
     });
@@ -109,7 +138,8 @@
             chatUsers.add(user);
             addNavItem(user);
             addTabPane(user);
+            messages[user] = [];
         }
-        addMessage(user, obj);
+        addMessage(user, obj, true);
     });
 </script>

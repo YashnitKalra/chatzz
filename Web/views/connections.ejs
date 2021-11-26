@@ -1,4 +1,4 @@
-<div class="tab-pane container-fluid fade" id="connections">
+<div class="tab-pane container-fluid fade p-0" id="connections">
     <table class="table table-borderless text-center text-light" id="connectionsTable"></table>
 </div>
 
@@ -8,9 +8,11 @@
             chatUsers.add(id);
             addNavItem(id);
             addTabPane(id);
+            messages[id] = [];
         }
-        $(`#${id}-chat-link`).click();
         $(`#message-nav`).click();
+        $(`#${id}-chat-link`).click();
+        setTimeout(function(){$(`#${id}-chat-link`).click();}, 150);
     }
 
     function addConnection(id, name){
