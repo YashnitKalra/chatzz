@@ -47,11 +47,22 @@ tr:hover{
     margin-left: auto;
     background: radial-gradient(#1f29a8, #11165f);
     word-wrap: break-word;
+    border-radius: 20px 20px 0px 20px;
 }
 
 .received-message{
     background: radial-gradient(#006199, #01456d);
     word-wrap: break-word;
+    border-radius: 20px 20px 20px 0;
+}
+
+.last-message{
+    display: block;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    font-style: italic;
+    font-family: monospace;
+    white-space: nowrap;
 }
 
 @media only screen and (max-width: 600px) {

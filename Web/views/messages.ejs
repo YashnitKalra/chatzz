@@ -1,9 +1,9 @@
 <div class="tab-pane container-fluid active p-0" id="messages">
     <div class="d-flex h-100 p-0">
-        <div class="w-25 container px-1 border" style="overflow-y: auto;">
+        <div class="w-25 container px-1 border border-left-0 border-top-0" style="overflow-y: auto;">
             <ul class="nav nav-tabs flex-column" id="chatUsers"></ul>
         </div>
-        <div class="w-75 bg-1 tab-content border" id="chats"></div>
+        <div class="w-75 bg-1 tab-content border border-left-0 border-top-0 border-right-0" id="chats"></div>
     </div>
 </div>
 
@@ -31,7 +31,7 @@
                 data: { "user": id, "msg": msg },
                 success: function (result) {
                     $(`#${id}-message`).val("");
-                    addMessage(id, result, true);
+                    addMessage(id, result, true, true);
                     moveNavToTop(id);
                 }
             });
@@ -43,9 +43,10 @@
             topNav = `#${user}-chat-link`;
         
         $("#chatUsers").append(
-            `<li class="nav-item">
+            `<li class="nav-item py-1 w-100">
                 <a href="#${user}-tab-pane" class="nav-link" data-toggle="tab" id="${user}-chat-link" onclick="scrollBottom('${user}')">
                     <span id="${user}-sentiment"></span> ${user}
+                    <small><span class="text-info last-message" id="${user}-last-message"></span></small>
                 </a>
             </li>`
         );
@@ -85,7 +86,11 @@
         return s;
     }
 
-    function addMessage(user, obj, analyzeSentiment) {
+    function updateLastMessage(user, obj){
+        $(`#${user}-last-message`).text(`${obj.sent?"You: ":""}${obj.message}`);
+    }
+
+    function addMessage(user, obj, analyzeSentiment, isLastMessage) {
         var d = new Date(obj.timestamp);
         $(`#${user}-chats`).append(
             `<div class="${obj.sent ? "ml-auto" : "mr-auto"} my-1" style="max-width: 80%;">
@@ -117,12 +122,14 @@
                         $(`#${user}-sentiment`).html("&#128515;");
                     else
                         $(`#${user}-sentiment`).html("&#128577;");
-
                 }
             });
         }
 
         scrollBottom(user);
+
+        if(isLastMessage)
+            updateLastMessage(user, obj);
     }
 
     function scrollBottom(user) {
@@ -140,7 +147,7 @@
                 addNavItem(user);
                 addTabPane(user);
                 for (let i = result[user].length - 1; i >= 0; i--)
-                    addMessage(user, result[user][i], i===0);
+                    addMessage(user, result[user][i], i===0, i===0);
             }
         }
     });
@@ -152,7 +159,7 @@
             addTabPane(user);
             messages[user] = [];
         }
-        addMessage(user, obj, true);
+        addMessage(user, obj, true, true);
         moveNavToTop(user);
     });
 </script>
