@@ -19,6 +19,10 @@
         $("#connectionsTable").append(`<tr onclick="openchat('${id}')"><td>${name}</td><td>></td></tr>`);
     }
 
+    function updateConnectionCountBy(num){
+        $("#connection-count").text(parseInt($("#connection-count").text()) + num);
+    }
+
     $.ajax({
         url: "/getConnections",
         method: "GET",
@@ -31,6 +35,7 @@
                 let name = connection.name;
                 addConnection(id, name);
             }
+            updateConnectionCountBy(result.length);
         }
     });
 </script>

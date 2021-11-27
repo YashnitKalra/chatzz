@@ -20,6 +20,10 @@
 
 <script>
 
+    function updateRequestCountBy(num){
+        $("#request-count").text(parseInt($("#request-count").text()) + num);
+    }
+
     function addReceivedRequest(id, name){
         $("#receivedRequestsList").append(
             `<div class="d-flex justify-content-around py-2" id="${id}-received-div">
@@ -41,6 +45,8 @@
                     alert("Request Accepted");
                     $(`#${id}-received-div`).remove();
                     addConnection(id, name);
+                    updateConnectionCountBy(1);
+                    updateRequestCountBy(-1);
                 }
             });
         });
@@ -54,6 +60,7 @@
                 success: function(result){
                     alert("Request Rejected");
                     $(`#${id}-received-div`).remove();
+                    updateRequestCountBy(-1);
                 }
             });
         });
@@ -88,6 +95,7 @@
         success: function (result) {
             for (user of result)
                 addReceivedRequest(user._id, user.name);
+            updateRequestCountBy(result.length);
         },
     });
 
@@ -99,5 +107,25 @@
             for (user of result)
                 addSentRequest(user._id, user.name);
         },
+    });
+
+    socket.on('receive-request', (username, name) => {
+        addReceivedRequest(username, name);
+        updateRequestCountBy(1);
+    });
+
+    socket.on('withdraw-request', (username) => {
+        $(`#${username}-received-div`).remove();
+        updateRequestCountBy(-1);
+    });
+
+    socket.on('accept-request', (username, name) => {
+        $(`#${username}-sent-div`).remove();
+        addConnection(username, name);
+        updateConnectionCountBy(1);
+    });
+
+    socket.on('reject-request', (username) => {
+        $(`#${username}-sent-div`).remove();
     });
 </script>

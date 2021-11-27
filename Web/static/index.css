@@ -46,10 +46,12 @@ tr:hover{
 .sent-message{
     margin-left: auto;
     background: radial-gradient(#1f29a8, #11165f);
+    word-wrap: break-word;
 }
 
 .received-message{
     background: radial-gradient(#006199, #01456d);
+    word-wrap: break-word;
 }
 
 @media only screen and (max-width: 600px) {

@@ -6,6 +6,7 @@
         <div class="w-75 bg-1 tab-content border" id="chats"></div>
     </div>
 </div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script>
     var username = "<%= username %>";
@@ -14,6 +15,7 @@
 
     let chatUsers = new Set();
     var messages = {}
+    let topNav = undefined;
 
     function checkKey(e, user) {
         if (e.key === "Enter")
@@ -30,12 +32,16 @@
                 success: function (result) {
                     $(`#${id}-message`).val("");
                     addMessage(id, result, true);
+                    moveNavToTop(id);
                 }
             });
         }
     }
 
     function addNavItem(user) {
+        if(!topNav)
+            topNav = `#${user}-chat-link`;
+        
         $("#chatUsers").append(
             `<li class="nav-item">
                 <a href="#${user}-tab-pane" class="nav-link" data-toggle="tab" id="${user}-chat-link" onclick="scrollBottom('${user}')">
@@ -43,6 +49,12 @@
                 </a>
             </li>`
         );
+    }
+
+    function moveNavToTop(user){
+        if(topNav)
+            $(`#${user}-chat-link`).parent().insertBefore($(topNav).parent());
+        topNav = `#${user}-chat-link`;
     }
 
     function addTabPane(user) {
@@ -76,12 +88,12 @@
     function addMessage(user, obj, analyzeSentiment) {
         var d = new Date(obj.timestamp);
         $(`#${user}-chats`).append(
-            `<div class="${obj.sent ? "ml-auto" : "mr-auto"} my-1">
-                <span class="${obj.sent ? "sent-message" : "received-message"} p-2 rounded d-block">
+            `<div class="${obj.sent ? "ml-auto" : "mr-auto"} my-1" style="max-width: 80%;">
+                <span class="${obj.sent ? "sent-message" : "received-message"} p-3 d-block">
                     ${obj.message}
                     <span class="d-block text-right"><sub class="d-inline-block text-right" style="color: #ddecff;">
                         ${format(d.getDate())}/${format(d.getMonth())}/${d.getFullYear()}, ${format(d.getHours())}:${format(d.getMinutes())}
-                    </span>
+                    </sub></span>
                 </span>
             </div>`
         );
@@ -141,5 +153,6 @@
             messages[user] = [];
         }
         addMessage(user, obj, true);
+        moveNavToTop(user);
     });
 </script>

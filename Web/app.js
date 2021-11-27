@@ -137,6 +137,8 @@ app.get("/sendConnectionRequest", (req, res) => {
         connected: false
     });
     connection.save().then(() => {
+        if(users[uId])
+            users[uId].emit("receive-request", req.session.username, req.session.name)
         res.send({"msg": "success"});
     }).catch(e => {
         res.send({"msg": "error"});
@@ -178,31 +180,46 @@ app.get("/getSentRequests", (req, res) => {
 });
 
 app.get("/withdrawRequest", (req, res) => {
+    let uId = req.query.user
     Connection.deleteOne(
         {
             user1: req.session.username,
-            user2: req.query.user
+            user2: uId
         }
-    ).then(result => res.send({})).catch(e => res.send({}));
+    ).then(result => {
+        if(users[uId])
+            users[uId].emit('withdraw-request', req.session.username)
+        res.send({})
+    }).catch(e => res.send({}));
 })
 
 app.get("/acceptRequest", (req, res) => {
+    let uId = req.query.user
     Connection.updateOne(
         {
-            user1: req.query.user,
+            user1: uId,
             user2: req.session.username
         },
         {$set: {connected: true}}
-    ).then(result => res.send({})).catch(e => res.send({}));;
+    ).then(result => {
+        if(users[uId])
+            users[uId].emit('accept-request', req.session.username, req.session.name);
+        res.send({})
+    }).catch(e => res.send({}));;
 });
 
 app.get("/rejectRequest", (req, res) => {
+    let uId = req.query.user
     Connection.deleteOne(
         {
-            user1: req.query.user,
+            user1: uId,
             user2: req.session.username
         }
-    ).then(result => res.send({})).catch(e => res.send({}));
+    ).then(result => {
+        if(users[uId])
+            users[uId].emit('reject-request', req.session.username)
+        res.send({})
+    }).catch(e => res.send({}));
 });
 
 app.get("/getConnections", (req, res) => {

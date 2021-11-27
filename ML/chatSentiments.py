@@ -12,7 +12,6 @@ def getSentiment(data):
     df = pd.DataFrame(new_data, columns = ["message", "date", "time"])
     df['date'] = pd.to_datetime(df['date'])
 
-    sentiments = SentimentIntensityAnalyzer()
     df["Positive"] = [sentiments.polarity_scores(i)["pos"] for i in df["message"]]
     df["Negative"] = [sentiments.polarity_scores(i)["neg"] for i in df["message"]]
     df["Neutral"] = [sentiments.polarity_scores(i)["neu"] for i in df["message"]]
@@ -27,6 +26,8 @@ def getSentiment(data):
         return "-1"
     else:
         return "0"
+
+sentiments = SentimentIntensityAnalyzer()
 
 # *************************************************************************************
 # Flask
